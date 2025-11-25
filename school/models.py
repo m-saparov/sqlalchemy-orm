@@ -17,3 +17,9 @@ class Student(Base):
     created_at = Column('created_at', DateTime, default=datetime.now)
     updated_at = Column('updated_at', DateTime, default=datetime.now, onupdate=datetime.now)
 
+    def __str__(self):
+        return f'Student(id={self.student_id}, name="{self.first_name} {self.last_name}")'
+
+    def __repr__(self):
+        return f'Student(id={self.student_id}, name="{self.first_name} {self.last_name}")'
+    

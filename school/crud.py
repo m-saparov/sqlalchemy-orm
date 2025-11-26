@@ -1,70 +1,74 @@
-from datetime import datetime
-from sqlalchemy import or_, not_, and_
-from .models import Student
+from .models import Task
 from .db import get_db
 
 
-def create_student(first_name: str, last_name: str, birthdate: datetime, bio: str | None = None):
-    student = Student(
-        first_name=first_name,
-        last_name=last_name,
-        birthdate=birthdate,
-        bio=bio
+def create_task(title: str, description: str | None = None):
+    task = Task(
+        title=title,
+        description=description
     )
-    
+
     with get_db() as session:
-        session.add(student)
+        session.add(task)
         session.commit()
 
-def get_students() -> list[Student]:
-    with get_db() as session:
-        students = session.query(Student).all()
-    
-    return students
 
-def get_one_student(student_id: int) -> Student | None:
+def get_tasks() -> list[Task]:
     with get_db() as session:
-        student = session.query(Student).get(student_id)
-    
-    return student
+        tasks = session.query(Task).order_by(Task.id.asc()).all()
 
-def search_students_by_first_name(first_name: str) -> list[Student]:
+    return tasks
+
+
+def get_one_task(task_id: int) -> Task | None:
     with get_db() as session:
-        students = session.query(Student).filter(Student.first_name==first_name).all()
-    
-    return students
+        task = session.query(Task).get(task_id)
 
-def search_students_by_name(name: str) -> list[Student]:
-    with get_db() as session:
-        students = session.query(Student).filter(
-            or_(Student.first_name.like(f'%{name}%'), Student.last_name.like(f'%{name}%'))
-        ).all()
-    
-    return students
+    return task
 
-def update_student(
-    student_id: int | None = None,
-    first_name: str | None = None, 
-    last_name: str | None = None, 
-    birthdate: datetime | None = None, 
-    bio: str | None = None
+
+def update_task(
+    task_id: int,
+    title: str | None = None,
+    description: str | None = None
 ):
-    student = get_one_student(student_id)
+    task = get_one_task(task_id)
 
-    if student:
+    if task:
         with get_db() as session:
-            student.first_name = first_name if first_name else student.first_name
-            student.last_name = last_name if last_name else student.last_name
-            student.birthdate = birthdate if birthdate else student.birthdate
-            student.bio = bio if bio else student.bio
+            task.title = title if title else task.title
+            task.description = description if description else task.description
 
-            session.add(student)
+            session.add(task)
             session.commit()
 
-def delete_student(student_id: int):
-    student = get_one_student(student_id)
+        return task
 
-    if student:
+    return None
+
+
+def delete_task(task_id: int):
+    task = get_one_task(task_id)
+
+    if task:
         with get_db() as session:
-            session.delete(student)
+            session.delete(task)
             session.commit()
+
+        return True
+
+    return False
+
+
+def change_task_status(task_id: int):
+    task = get_one_task(task_id)
+
+    if task:
+        with get_db() as session:
+            task.completed = not task.completed
+            session.add(task)
+            session.commit()
+
+        return task
+
+    return None

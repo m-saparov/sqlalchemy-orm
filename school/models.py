@@ -1,25 +1,23 @@
 from datetime import datetime
 from sqlalchemy import (
-    Column, Integer, String, Date, DateTime, Text,
+    Column, Integer, String, Boolean, DateTime
 )
 from .db import Base
 
 
-class Student(Base):
-    __tablename__ = 'students'
+class Task(Base):
+    __tablename__ = 'tasks'
 
-    student_id = Column('id', Integer, primary_key=True, nullable=False)
-    first_name = Column('first_name', String(length=64), nullable=False)
-    last_name = Column('last_name', String(length=64), nullable=False)
-    birthdate = Column('birth_date', Date, nullable=False)
-    bio = Column('bio', Text)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    title = Column(String(255), nullable=False)
+    description = Column(String(500))
+    completed = Column(Boolean, default=False)
 
-    created_at = Column('created_at', DateTime, default=datetime.now)
-    updated_at = Column('updated_at', DateTime, default=datetime.now, onupdate=datetime.now)
+    created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
     def __str__(self):
-        return f'Student(id={self.student_id}, name="{self.first_name} {self.last_name}")'
+        return f"Task(id={self.id}, title='{self.title}', completed={self.completed})"
 
     def __repr__(self):
-        return f'Student(id={self.student_id}, name="{self.first_name} {self.last_name}")'
-    
+        return f"Task(id={self.id}, title='{self.title}', completed={self.completed})"
